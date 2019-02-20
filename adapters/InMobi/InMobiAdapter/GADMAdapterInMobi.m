@@ -43,7 +43,11 @@ __attribute__((constructor)) static void initialize_imageCache() {
 @synthesize connector = connector_;
 
 + (NSString *)adapterVersion {
-  return @"7.1.1.0";
+  return @"7.2.4.0";
+}
+
++ (BOOL) isAppInitialised {
+  return isAccountInitialised;
 }
 
 + (BOOL) isAppInitialised {
@@ -63,8 +67,8 @@ __attribute__((constructor)) static void initialize_imageCache() {
   if ((self = [super init])) {
     self.connector = connector;
   }
-  [IMSdk initWithAccountID:[[self.connector credentials] objectForKey:@"accountid"] consentDictionary:[GADMInMobiConsent getConsent]];
-  isAccountInitialised = true;
+    [IMSdk initWithAccountID:[[self.connector credentials] objectForKey:@"accountid"] consentDictionary:[GADMInMobiConsent getConsent]];
+    isAccountInitialised = true;
   NSLog(@"Initialized successfully");
   if (self.rewardedConnector) {
     self.rewardedConnector = nil;
@@ -76,8 +80,8 @@ __attribute__((constructor)) static void initialize_imageCache() {
 - (instancetype)initWithRewardBasedVideoAdNetworkConnector:
         (id<GADMRewardBasedVideoAdNetworkConnector>)connector {
   self.rewardedConnector = connector;
-  [IMSdk initWithAccountID:[[self.rewardedConnector credentials] objectForKey:@"accountid"] consentDictionary:[GADMInMobiConsent getConsent]];
-  isAccountInitialised = true;
+    [IMSdk initWithAccountID:[[self.rewardedConnector credentials] objectForKey:@"accountid"] consentDictionary:[GADMInMobiConsent getConsent]];
+    isAccountInitialised = true;
   if (self.connector) {
     self.connector = nil;
   }
@@ -559,6 +563,7 @@ __attribute__((constructor)) static void initialize_imageCache() {
   NSString *key = [rewards allKeys][0];
 
   if (self.rewardedConnector != nil) {
+    [self.rewardedConnector adapterDidCompletePlayingRewardBasedVideoAd:self];
     GADAdReward *reward =
         [[GADAdReward alloc] initWithRewardType:key rewardAmount:[rewards objectForKey:key]];
     [self.rewardedConnector adapter:self didRewardUserWithReward:reward];
